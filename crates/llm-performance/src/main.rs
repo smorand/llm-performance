@@ -211,6 +211,14 @@ async fn run_models(config: &Config, http: &reqwest::Client, args: ModelsArgs) -
     Ok(())
 }
 
+fn format_centered_icon(icon: &'static str, col_width: usize) -> String {
+    let display_width = 2;
+    let pad = col_width.saturating_sub(display_width);
+    let left_pad = pad / 2;
+    let right_pad = pad - left_pad;
+    format!("{}{}{}", " ".repeat(left_pad), icon, " ".repeat(right_pad))
+}
+
 fn print_models_table(models: &[ModelInfo]) {
     let max_id_len = models
         .iter()
@@ -220,7 +228,7 @@ fn print_models_table(models: &[ModelInfo]) {
         .max("MODEL ID".len());
 
     println!(
-        "{:<width$}  {:^8}  {:^16}  {:^8}  {:^8}",
+        "{:<width$}  {:^8}  {:^18}  {:^8}  {:^8}",
         "MODEL ID",
         "TEXT",
         "ANTHROPIC NATIVE",
@@ -228,16 +236,21 @@ fn print_models_table(models: &[ModelInfo]) {
         "AUDIO",
         width = max_id_len
     );
-    println!("{:-<width$}", "", width = max_id_len + 52);
+    println!("{:-<width$}", "", width = max_id_len + 50);
 
     for m in models {
+        let text_cell = format_centered_icon("✅", 8);
+        let anthropic_cell = format_centered_icon(if m.anthropic_native { "✅" } else { "⏭️" }, 18);
+        let vision_cell = format_centered_icon(if m.vision { "✅" } else { "❌" }, 8);
+        let audio_cell = format_centered_icon(if m.audio { "✅" } else { "❌" }, 8);
+
         println!(
-            "{:<width$}  {:^8}  {:^16}  {:^8}  {:^8}",
+            "{:<width$}  {}  {}  {}  {}",
             m.id,
-            "✅",
-            if m.anthropic_native { "✅" } else { "·" },
-            if m.vision { "✅" } else { "·" },
-            if m.audio { "✅" } else { "·" },
+            text_cell,
+            anthropic_cell,
+            vision_cell,
+            audio_cell,
             width = max_id_len
         );
     }
