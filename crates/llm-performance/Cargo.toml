@@ -1,0 +1,31 @@
+[package]
+name         = "llm-performance"
+version.workspace      = true
+edition.workspace      = true
+rust-version.workspace = true
+license.workspace      = true
+authors.workspace      = true
+repository.workspace   = true
+
+[[bin]]
+name = "llm-performance"
+path = "src/main.rs"
+
+[lints]
+workspace = true
+
+[dependencies]
+llm-performance-core = { path = "../core", version = "0.1.0" }
+reqwest             = { workspace = true }
+regex               = { workspace = true }
+tokio               = { workspace = true }
+clap                = { workspace = true }
+clap-verbosity-flag = { workspace = true }
+tracing             = { workspace = true }
+anyhow              = { workspace = true }
+serde               = { workspace = true }
+serde_json          = { workspace = true }
+
+[dev-dependencies]
+assert_cmd = { workspace = true }
+predicates = { workspace = true }
