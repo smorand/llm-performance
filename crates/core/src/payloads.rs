@@ -3,7 +3,7 @@
 use base64::Engine;
 use base64::prelude::BASE64_STANDARD;
 
-/// Standard minimal text prompt for latency / TTFT / TPOT probing.
+/// Standard minimal text prompt for latency / TTFT probing.
 pub const PROBE_PROMPT: &str = "ping";
 
 /// Valid 8x8 crimson PNG image encoded as standard base64.

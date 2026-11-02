@@ -1,7 +1,7 @@
 # llm-performance
 
 ## Overview
-CLI benchmarking and capability testing tool for LLM models (OpenAI chat completions and native Anthropic messages), measuring latency, TTFT, TPOT, throughput (TPS), multimodal support (vision, audio), and the impact of reasoning/thinking levels across multiple trials.
+CLI benchmarking and capability testing tool for LLM models (OpenAI chat completions and native Anthropic messages), measuring latency, TTFT, throughput (TPS), multimodal support (vision, audio), and the impact of reasoning/thinking levels across multiple trials.
 
 ## Key Commands
 make sync          # Fetch deps + build workspace

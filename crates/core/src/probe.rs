@@ -265,7 +265,7 @@ fn build_openai_messages(payload: ProbePayload) -> serde_json::Value {
     }
 }
 
-/// Consume an OpenAI SSE byte stream and calculate latency, TTFT, TPOT, and TPS.
+/// Consume an OpenAI SSE byte stream and calculate latency, TTFT, and TPS.
 #[allow(
     clippy::cast_possible_truncation,
     clippy::cast_precision_loss,
@@ -355,15 +355,6 @@ async fn parse_openai_sse_stream(
     let latency_ms = u64::try_from(start_time.elapsed().as_millis()).unwrap_or(u64::MAX);
     let output_tokens = reported_output_tokens.unwrap_or(chunk_token_count.max(1));
 
-    let tpot_ms = match ttft_ms {
-        Some(ttft) if output_tokens > 1 => {
-            Some((latency_ms.saturating_sub(ttft)) as f64 / (output_tokens - 1) as f64)
-        }
-        Some(ttft) => Some(latency_ms.saturating_sub(ttft) as f64),
-        None if output_tokens > 0 => Some(latency_ms as f64 / output_tokens as f64),
-        None => None,
-    };
-
     let tps = if output_tokens > 0 {
         Some((output_tokens as f64) / (latency_ms.max(1) as f64 / 1000.0))
     } else {
@@ -373,7 +364,6 @@ async fn parse_openai_sse_stream(
     Ok(TrialMetric {
         latency_ms,
         ttft_ms,
-        tpot_ms,
         tps,
         output_tokens,
         reasoning_tokens: reported_reasoning_tokens,
@@ -403,12 +393,6 @@ async fn parse_openai_json_response(
         .and_then(|d| d.get("reasoning_tokens"))
         .and_then(serde_json::Value::as_u64);
 
-    let tpot_ms = if output_tokens > 0 {
-        Some(latency_ms as f64 / output_tokens as f64)
-    } else {
-        None
-    };
-
     let tps = if output_tokens > 0 {
         Some((output_tokens as f64) / (latency_ms.max(1) as f64 / 1000.0))
     } else {
@@ -418,14 +402,13 @@ async fn parse_openai_json_response(
     Ok(TrialMetric {
         latency_ms,
         ttft_ms: None,
-        tpot_ms,
         tps,
         output_tokens,
         reasoning_tokens,
     })
 }
 
-/// Consume an Anthropic SSE byte stream and calculate latency, TTFT, TPOT, and TPS.
+/// Consume an Anthropic SSE byte stream and calculate latency, TTFT, and TPS.
 #[allow(
     clippy::cast_possible_truncation,
     clippy::cast_precision_loss,
@@ -537,15 +520,6 @@ async fn parse_anthropic_sse_stream(
     let latency_ms = u64::try_from(start_time.elapsed().as_millis()).unwrap_or(u64::MAX);
     let output_tokens = reported_output_tokens.unwrap_or(chunk_token_count.max(1));
 
-    let tpot_ms = match ttft_ms {
-        Some(ttft) if output_tokens > 1 => {
-            Some((latency_ms.saturating_sub(ttft)) as f64 / (output_tokens - 1) as f64)
-        }
-        Some(ttft) => Some(latency_ms.saturating_sub(ttft) as f64),
-        None if output_tokens > 0 => Some(latency_ms as f64 / output_tokens as f64),
-        None => None,
-    };
-
     let tps = if output_tokens > 0 {
         Some((output_tokens as f64) / (latency_ms.max(1) as f64 / 1000.0))
     } else {
@@ -555,7 +529,6 @@ async fn parse_anthropic_sse_stream(
     Ok(TrialMetric {
         latency_ms,
         ttft_ms,
-        tpot_ms,
         tps,
         output_tokens,
         reasoning_tokens: reported_reasoning_tokens,
@@ -584,12 +557,6 @@ async fn parse_anthropic_json_response(
         .and_then(|u| u.get("thinking_tokens"))
         .and_then(serde_json::Value::as_u64);
 
-    let tpot_ms = if output_tokens > 0 {
-        Some(latency_ms as f64 / output_tokens as f64)
-    } else {
-        None
-    };
-
     let tps = if output_tokens > 0 {
         Some((output_tokens as f64) / (latency_ms.max(1) as f64 / 1000.0))
     } else {
@@ -599,7 +566,6 @@ async fn parse_anthropic_json_response(
     Ok(TrialMetric {
         latency_ms,
         ttft_ms: None,
-        tpot_ms,
         tps,
         output_tokens,
         reasoning_tokens,
@@ -720,7 +686,6 @@ mod tests {
         assert!(metric_stream.ttft_ms.is_some());
         assert_eq!(metric_stream.output_tokens, 10);
         assert_eq!(metric_stream.reasoning_tokens, Some(4));
-        assert!(metric_stream.tpot_ms.is_some());
         assert!(metric_stream.tps.is_some());
 
         // Non-streaming
@@ -739,7 +704,6 @@ mod tests {
         assert_eq!(metric_non_stream.ttft_ms, None);
         assert_eq!(metric_non_stream.output_tokens, 12);
         assert_eq!(metric_non_stream.reasoning_tokens, Some(3));
-        assert!(metric_non_stream.tpot_ms.is_some());
         assert!(metric_non_stream.tps.is_some());
 
         handle.abort();

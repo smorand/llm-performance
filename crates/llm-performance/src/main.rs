@@ -328,18 +328,10 @@ fn print_benchmark_table(models: &[ModelBenchResult], failures_only: bool) {
     }
 
     println!(
-        "{:<32} {:<18} {:<10} {:>7} {:>9} {:>9} {:>8} {:>8} {:>8}",
-        "MODEL",
-        "PROBE",
-        "THINKING",
-        "SUCCESS",
-        "LAT (P50)",
-        "LAT (P95)",
-        "TTFT(P50)",
-        "TPOT",
-        "TPS"
+        "{:<32} {:<18} {:<10} {:>7} {:>9} {:>9} {:>8} {:>8}",
+        "MODEL", "PROBE", "THINKING", "SUCCESS", "LAT (P50)", "LAT (P95)", "TTFT(P50)", "TPS"
     );
-    println!("{:-<120}", "");
+    println!("{:-<110}", "");
 
     let mut printed_probes = 0;
 
@@ -370,11 +362,6 @@ fn print_benchmark_table(models: &[ModelBenchResult], failures_only: bool) {
                 .ttft_stats
                 .as_ref()
                 .map_or("-".to_string(), |s| format!("{:.0}ms", s.p50));
-            let tpot_mean = probe
-                .stats
-                .tpot_stats
-                .as_ref()
-                .map_or("-".to_string(), |s| format!("{:.1}ms", s.mean));
             let tps_mean = probe
                 .stats
                 .tps_stats
@@ -382,7 +369,7 @@ fn print_benchmark_table(models: &[ModelBenchResult], failures_only: bool) {
                 .map_or("-".to_string(), |s| format!("{:.1}", s.mean));
 
             println!(
-                "{:<32} {:<18} {:<10} {:>7} {:>9} {:>9} {:>8} {:>8} {:>8}",
+                "{:<32} {:<18} {:<10} {:>7} {:>9} {:>9} {:>8} {:>8}",
                 truncate(&model.model_id, 32),
                 probe.name,
                 probe.thinking_level.to_string(),
@@ -390,7 +377,6 @@ fn print_benchmark_table(models: &[ModelBenchResult], failures_only: bool) {
                 lat_p50,
                 lat_p95,
                 ttft_p50,
-                tpot_mean,
                 tps_mean
             );
 

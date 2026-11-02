@@ -11,9 +11,6 @@ pub struct TrialMetric {
     /// Time to first token (TTFT) in milliseconds when streaming is enabled.
     pub ttft_ms: Option<u64>,
 
-    /// Time per output token (TPOT) in milliseconds.
-    pub tpot_ms: Option<f64>,
-
     /// Throughput in tokens per second (TPS).
     pub tps: Option<f64>,
 
@@ -63,9 +60,6 @@ pub struct AggregateStats {
 
     /// Distribution statistics for time to first token (TTFT) in milliseconds.
     pub ttft_stats: Option<PercentileStats>,
-
-    /// Distribution statistics for time per output token (TPOT) in milliseconds.
-    pub tpot_stats: Option<PercentileStats>,
 
     /// Distribution statistics for token throughput (tokens per second).
     pub tps_stats: Option<PercentileStats>,
@@ -153,9 +147,6 @@ pub fn aggregate_trials(trials: &[Result<TrialMetric, String>]) -> AggregateStat
         .collect();
     let ttft_stats = compute_percentiles(&ttft_values);
 
-    let tpot_values: Vec<f64> = ok_metrics.iter().filter_map(|m| m.tpot_ms).collect();
-    let tpot_stats = compute_percentiles(&tpot_values);
-
     let tps_values: Vec<f64> = ok_metrics.iter().filter_map(|m| m.tps).collect();
     let tps_stats = compute_percentiles(&tps_values);
 
@@ -185,7 +176,6 @@ pub fn aggregate_trials(trials: &[Result<TrialMetric, String>]) -> AggregateStat
         failed_trials,
         latency_stats,
         ttft_stats,
-        tpot_stats,
         tps_stats,
         mean_output_tokens,
         mean_reasoning_tokens,
@@ -240,7 +230,6 @@ mod tests {
         assert_eq!(agg.failed_trials, 2);
         assert_eq!(agg.latency_stats, None);
         assert_eq!(agg.ttft_stats, None);
-        assert_eq!(agg.tpot_stats, None);
         assert_eq!(agg.tps_stats, None);
         assert_eq!(agg.mean_output_tokens, 0.0);
         assert_eq!(agg.mean_reasoning_tokens, None);
@@ -252,7 +241,6 @@ mod tests {
             Ok(TrialMetric {
                 latency_ms: 500,
                 ttft_ms: Some(100),
-                tpot_ms: Some(40.0),
                 tps: Some(25.0),
                 output_tokens: 11,
                 reasoning_tokens: Some(50),
@@ -260,7 +248,6 @@ mod tests {
             Ok(TrialMetric {
                 latency_ms: 700,
                 ttft_ms: Some(200),
-                tpot_ms: Some(50.0),
                 tps: Some(20.0),
                 output_tokens: 11,
                 reasoning_tokens: Some(100),
@@ -292,7 +279,6 @@ mod tests {
         let metric = TrialMetric {
             latency_ms: 1234,
             ttft_ms: Some(120),
-            tpot_ms: Some(15.5),
             tps: Some(64.5),
             output_tokens: 80,
             reasoning_tokens: Some(200),

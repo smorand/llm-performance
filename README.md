@@ -6,7 +6,7 @@ A fast, flexible CLI tool in Rust to probe LLM model capabilities, evaluate gene
 
 - **Capability Testing**: Validates OpenAI chat completions, native Anthropic Messages API, vision (image), and audio capabilities.
 - **Thinking / Reasoning Evaluation**: Measures latency and throughput changes across thinking levels (`off`, `minimal`, `low`, `medium`, `high`).
-- **Statistical Rigor**: Aggregates multi-trial benchmarks (default 10 tries) providing Min, Mean, P50 (Median), P95, and Max for TTFT, TPOT, Latency, and TPS.
+- **Statistical Rigor**: Aggregates multi-trial benchmarks (default 10 tries) providing Min, Mean, P50 (Median), P95, and Max for TTFT, Latency, and TPS.
 - **Layered Configuration**: Resolution hierarchy: Defaults < TOML config < Environment variables (`LLM_PERFM_*` with `IBM_ICA_*` fallbacks) < CLI arguments.
 - **Embedded Payloads**: Self-contained test media (PNG 8x8, WAV 20ms) guaranteeing backend compatibility without external asset dependencies.
 
